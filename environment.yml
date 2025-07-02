@@ -1,0 +1,6 @@
+name: symmer-dev
+channels:
+  - defaults
+dependencies:
+  - python=3.11
+prefix: /Users/qianfeng/anaconda3/envs/symmer-dev
