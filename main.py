@@ -71,7 +71,7 @@ def get_MPO(operator: Dict[str, complex], max_bond_dimension: int = None) -> Mat
     H_mpo = builder.build_mpo()
     return H_mpo
 
-def dmrg_solver(MPOOp: MatrixProductOperator, dmrg=None, gs_guess=None,bond_dims=[10, 20, 100, 100, 200],cutoffs=1e-10) -> Tuple[QuantumState,np.complex128]:
+def dmrg_solver(MPOOp: MatrixProductOperator, dmrg=None, gs_guess=None,bond_dims=[10, 20, 100, 100, 200],cutoffs=1e-10,output_state = 0) -> Tuple[QuantumState,np.complex128]:
     """
     Use quimb to find the groundstate and energy of an MPOOp.
 
@@ -88,8 +88,13 @@ def dmrg_solver(MPOOp: MatrixProductOperator, dmrg=None, gs_guess=None,bond_dims
     if dmrg is None:
         dmrg = DMRG2(MPOOp, bond_dims=bond_dims, cutoffs=cutoffs, p0=gs_guess)
     dmrg.solve(verbosity=0, tol=1e-6)
-
-    dmrg_state = dmrg.state.to_dense()
-    dmrg_state = QuantumState.from_array(dmrg_state).cleanup(zero_threshold=1e-5)
-    dmrg_energy = dmrg.energy.real
+    if output_state == 0:
+        dmrg_state = dmrg.state.to_dense()
+        dmrg_state = QuantumState.from_array(dmrg_state).cleanup(zero_threshold=1e-5)
+        dmrg_energy = dmrg.energy.real
+    elif output_state == 1:
+        dmrg_state = dmrg.state
+        dmrg_energy = dmrg.energy.real
+    else:
+        raise ValueError("output_state must be 0 or 1")
     return dmrg_state, dmrg_energy
